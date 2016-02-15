@@ -206,12 +206,41 @@ def dcm2angle(C, output_unit='rad', rotation_sequence='ZYX'):
     quaternions.
     """
     C, N = _input_check_Nx3x3(C)
+    
+    rotation_sequence = rotation_sequence.upper()
 
     if(rotation_sequence == 'ZYX'):
         rotAngle1 = np.arctan2(C[..., 0, 1], C[..., 0, 0])   # Yaw
         rotAngle2 = -np.arcsin(C[..., 0, 2])  # Pitch
         rotAngle3 = np.arctan2(C[..., 1, 2], C[..., 2, 2])  # Roll
-
+    elif rotation_sequence == 'ZYZ':
+        rotAngle1 = np.arctan2(C[..., 2, 1], C[..., 2, 0])
+        rotAngle2 = np.arccos(C[..., 2, 2])
+        rotAngle3 = np.arctan2(C[..., 1, 2], -C[..., 0, 2])
+    elif rotation_sequence == 'ZXY':
+        rotAngle1 = np.arctan2(-C[..., 1, 0], C[..., 1, 1])
+        rotAngle2 = np.arcsin(C[..., 1, 2])
+        rotAngle3 = np.arctan2(-C[..., 0, 2], C[..., 2, 2])
+    elif rotation_sequence == 'ZXZ':
+        rotAngle1 = np.arctan2(C[..., 2, 0], -C[..., 2, 1])
+        rotAngle2 = np.arcsin(C[..., 2, 2])
+        rotAngle3 = np.arctan2(C[..., 0, 2], C[..., 1, 2])
+    elif rotation_sequence == 'YXZ':
+        rotAngle1 = np.arctan2(C[..., 2, 0], C[..., 2, 2])
+        rotAngle2 = -np.arcsin(C[..., 2, 1])
+        rotAngle3 = np.arctan2(C[..., 0, 1], C[..., 1, 1])
+    elif rotation_sequence == 'YXY':
+        rotAngle1 = np.arctan2(C[..., 1, 0], C[..., 1, 2])
+        rotAngle2 = np.arccos(C[..., 1, 1])
+        rotAngle3 = np.arctan2(C[..., 0, 1], -C[..., 2, 1])
+    elif rotation_sequence == 'YZX':
+        rotAngle1 = np.arctan2(-C[..., 0, 2], C[..., 0, 0])
+        rotAngle2 = np.arcsin(C[..., 0, 1])
+        rotAngle3 = np.arctan2(-C[..., 2, 1], C[..., 1, 1])
+    elif rotation_sequence == 'YZY':
+        rotAngle1 = np.arctan2(C[..., 1, 2], -C[..., 1, 0])
+        rotAngle2 = np.arccos(C[..., 1, 1])
+        rotAngle3 = np.arctan2(C[..., 2, 1], C[..., 0, 1])
     else:
         raise NotImplementedError('Rotation sequences other than ZYX are not currently implemented')
 
@@ -1302,4 +1331,27 @@ def unwrapToRange(angles, min, max, threshold=np.pi):
         output[i] = angles[i] + offset
 
     return output
+
+def rotvtom(phi, output_type='ndarray'):
+    """
+    Return the 2nd order derived incremental rotation matrix based on rotation 
+    vector phi. The rotation vector phi must be in delta angles, not angular 
+    rates.
+
+    Refer to p200 in "Introduction to strapdown inertial navigation systems"
+    Oct 29, 2005 - Paul G. Savage
+    """
+    
+    philen = np.linalg.norm(phi);
+    
+    if philen == 0:
+        R = np.eye(3,3);
+    else:
+        phiskew = navpy.skew(phi);
+        R = np.eye(3,3) + np.sin(philen)/philen*phiskew + (1 - np.cos(philen))/(philen*philen) * phiskew*phiskew;
+
+    if output_type != 'ndarray':
+        R = asmatrix(R)
+        
+    return R
     
