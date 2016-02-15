@@ -36,6 +36,10 @@ def rot(angle, axis, input_unit = 'rad', output_type = 'ndarray'):
     Created:    	 Feb 12, 2016
     Last Modified: Feb 12, 2016
     """
+    
+    if isinstance(axis, str):
+        axis = axis.upper()
+        
     if axis != 'X' and axis != 'Y' and axis != 'Z' and axis != 0 and axis != 1 and axis != 2:
         raise ValueError('Axis must be 0, 1 or 2 or \'X\', \'Y\' or \'Z\'')
 
@@ -79,20 +83,23 @@ def angle2dcm(*argv, input_unit='rad',
               rotation_sequence='ZYX', output_type='ndarray'):
     """
     This function converts Euler Angle into Direction Cosine Matrix (DCM).
-    The DCM is described by three sucessive rotation rotAngle1, rotAngle2, and
-    rotAngle3 about the axis described by the rotation_sequence.
+    The DCM is described by three sucessive rotations about the axis described 
+    by the rotation_sequence.
+    
+    Angles can be specified either by a vector of N,3 angles, or as 3 separate
+    angles.
 
-    The default rotation_sequence='ZYX' is the aerospace sequence and rotAngle1
-    is the yaw angle, rotAngle2 is the pitch angle, and rotAngle3 is the roll
-    angle. In this case DCM transforms a vector from the locally level
-    coordinate frame (i.e. the NED frame) to the body frame.
+    The default rotation_sequence='ZYX' is the aerospace sequence and the first
+    angle is the yaw angle, the second angle is the pitch angle, and the third 
+    angle is the roll angle. In this case DCM transforms a vector from the 
+    locally level coordinate frame (i.e. the NED frame) to the body frame.
 
     This function can batch process a series of rotations (e.g., time series
     of Euler angles).
 
     Parameters
     ----------
-    rotAngle1, rotAngle2, rotAngle3 : angles {(N,), (N,1), or (1,N)}
+    angles or rotAngle1, rotAngle2, rotAngle3 : angles
             They are a sequence of angles about successive axes described by
             rotation_sequence.
     input_unit : {'rad', 'deg'}, optional
@@ -118,7 +125,7 @@ def angle2dcm(*argv, input_unit='rad',
     elif len(argv) == 3:
         rotAngles = np.asarray([argv[0], argv[1], argv[2]])
     else:
-        raise ValueError('You must supply either a vector of 3 values or 3 parameters')
+        raise ValueError('You must supply either a vector of Nx3 values or 3 separate parameters')
         
     rotAngles, N = _input_check_Nx3(rotAngles)
     
@@ -133,7 +140,7 @@ def angle2dcm(*argv, input_unit='rad',
 
     R = np.empty((3, N, 3, 3))
     for i in range(3):
-        if N>1:
+        if N > 1:
             rot2 = rot(rotAngles[:,i], rotation_sequence[i])
         else:
             rot2 = rot(rotAngles[i], rotation_sequence[i])

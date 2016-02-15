@@ -36,6 +36,10 @@ def rot(angle, axis, input_unit = 'rad', output_type = 'ndarray'):
     Created:    	 Feb 12, 2016
     Last Modified: Feb 12, 2016
     """
+    
+    if isinstance(axis, str):
+        axis = axis.upper()
+        
     if axis != 'X' and axis != 'Y' and axis != 'Z' and axis != 0 and axis != 1 and axis != 2:
         raise ValueError('Axis must be 0, 1 or 2 or \'X\', \'Y\' or \'Z\'')
 
