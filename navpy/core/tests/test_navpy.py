@@ -431,7 +431,18 @@ class TestNavClass(unittest.TestCase):
         # conditions.  These tests can be added later to impose desired behavior
         #self.assertAlmostEqual( np.pi, nav.wrap_pi( np.pi))
         #self.assertAlmostEqual(-np.pi, nav.wrap_pi(-np.pi))
+
+    def test_unwrapToRange(self):
+        """
+        Test angle sequence smoother
+        """
+
+        angles = np.hstack((np.arange(0, 10, 0.1), np.arange(9.9, 0, -0.1)))
+        anglesWrapped = navpy.wrapToRange(angles, 0, 2*np.pi)
+        anglesUnwrapped = navpy.unwrapToRange(anglesWrapped, 0, 2*np.pi)
         
+        np.testing.assert_almost_equal(angles, anglesUnwrapped, decimal=5)
+
     def test_angle2dcm(self):
         """
         Test forming transformation from navigation to body frame based on

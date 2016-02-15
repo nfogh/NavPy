@@ -1254,12 +1254,50 @@ def skew(w,output_type='ndarray'):
 
     return C
 
+def wrapToRange(vals, min, max):
+    """
+    Wrap the values to be within the interval from min to max
+    
+    Parameters:
+    vals: {(N,1)} Values to be wrapped
+    min: Minimum value
+    max: Maximum value
+    """
+    dum,N = _input_check_Nx1(vals)
+    
+    return np.mod(vals - min, max - min) + min
+    
 def wrapToPi(e):
     """
     Wraping angle to [-pi,pi] interval
     """
-    dum,N = _input_check_Nx1(e)
     
-    ew = np.mod(e+np.pi,2*np.pi)-np.pi
+    return wrapToRange(e, -np.pi, np.pi)
 
-    return ew
+def unwrapToRange(angles, min, max, threshold=np.pi):
+    """
+    Ensure that there are no "jumps" in the angle if it has previously been 
+    limited to the +/- pi interval.
+    
+    Parameters:
+    angles: Vector of angles to unwrap
+    threshold: Threshold at when a jump is detected
+    
+    Returns:
+    angles: Unwrapped angles
+    """
+    output = np.empty_like(angles)
+    
+    offset = 0
+    rng = max - min
+    for i in range(1, angles.size):
+        diff = angles[i-1] - angles[i]
+        if diff > threshold:
+            offset = offset + rng
+        elif diff < -threshold:
+            offset = offset - rng
+        
+        output[i] = angles[i] + offset
+
+    return output
+    
