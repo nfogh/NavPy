@@ -1286,8 +1286,10 @@ def unwrapToRange(angles, min, max, threshold=np.pi):
     Returns:
     angles: Unwrapped angles
     """
+    angles,N = _input_check_Nx1(np.array(angles))
     output = np.empty_like(angles)
-    
+
+    output[0] = angles[0]
     offset = 0
     rng = max - min
     for i in range(1, angles.size):
