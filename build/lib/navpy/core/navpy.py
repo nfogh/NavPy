@@ -79,23 +79,20 @@ def angle2dcm(*argv, input_unit='rad',
               rotation_sequence='ZYX', output_type='ndarray'):
     """
     This function converts Euler Angle into Direction Cosine Matrix (DCM).
-    The DCM is described by three sucessive rotations about the axis described 
-    by the rotation_sequence.
-    
-    Angles can be specified either by a vector of N,3 angles, or as 3 separate
-    angles.
+    The DCM is described by three sucessive rotation rotAngle1, rotAngle2, and
+    rotAngle3 about the axis described by the rotation_sequence.
 
-    The default rotation_sequence='ZYX' is the aerospace sequence and the first
-    angle is the yaw angle, the second angle is the pitch angle, and the third 
-    angle is the roll angle. In this case DCM transforms a vector from the 
-    locally level coordinate frame (i.e. the NED frame) to the body frame.
+    The default rotation_sequence='ZYX' is the aerospace sequence and rotAngle1
+    is the yaw angle, rotAngle2 is the pitch angle, and rotAngle3 is the roll
+    angle. In this case DCM transforms a vector from the locally level
+    coordinate frame (i.e. the NED frame) to the body frame.
 
     This function can batch process a series of rotations (e.g., time series
     of Euler angles).
 
     Parameters
     ----------
-    angles or rotAngle1, rotAngle2, rotAngle3 : angles
+    rotAngle1, rotAngle2, rotAngle3 : angles {(N,), (N,1), or (1,N)}
             They are a sequence of angles about successive axes described by
             rotation_sequence.
     input_unit : {'rad', 'deg'}, optional
@@ -121,7 +118,7 @@ def angle2dcm(*argv, input_unit='rad',
     elif len(argv) == 3:
         rotAngles = np.asarray([argv[0], argv[1], argv[2]])
     else:
-        raise ValueError('You must supply either a vector of Nx3 values or 3 separate parameters')
+        raise ValueError('You must supply either a vector of 3 values or 3 parameters')
         
     rotAngles, N = _input_check_Nx3(rotAngles)
     
@@ -136,7 +133,7 @@ def angle2dcm(*argv, input_unit='rad',
 
     R = np.empty((3, N, 3, 3))
     for i in range(3):
-        if N > 1:
+        if N>1:
             rot2 = rot(rotAngles[:,i], rotation_sequence[i])
         else:
             rot2 = rot(rotAngles[i], rotation_sequence[i])
