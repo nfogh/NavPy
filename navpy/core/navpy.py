@@ -196,7 +196,7 @@ def dcm2angle(C, output_unit='rad', rotation_sequence='ZYX'):
 
     Notes
     -----
-    The returned rotAngle1 and 3 will be between   +/- 180 deg (+/- pi rad).
+    For ZYX, the returned rotAngle1 and 3 will be between   +/- 180 deg (+/- pi rad).
     In contrast, rotAngle2 will be in the interval +/- 90 deg (+/- pi/2 rad).
 
     In the 'ZYX' or '321' aerospace sequence, that means the pitch angle
@@ -209,7 +209,7 @@ def dcm2angle(C, output_unit='rad', rotation_sequence='ZYX'):
     
     rotation_sequence = rotation_sequence.upper()
 
-    if(rotation_sequence == 'ZYX'):
+    if rotation_sequence == 'ZYX':
         rotAngle1 = np.arctan2(C[..., 0, 1], C[..., 0, 0])   # Yaw
         rotAngle2 = -np.arcsin(C[..., 0, 2])  # Pitch
         rotAngle3 = np.arctan2(C[..., 1, 2], C[..., 2, 2])  # Roll
@@ -223,7 +223,7 @@ def dcm2angle(C, output_unit='rad', rotation_sequence='ZYX'):
         rotAngle3 = np.arctan2(-C[..., 0, 2], C[..., 2, 2])
     elif rotation_sequence == 'ZXZ':
         rotAngle1 = np.arctan2(C[..., 2, 0], -C[..., 2, 1])
-        rotAngle2 = np.arcsin(C[..., 2, 2])
+        rotAngle2 = np.arccos(C[..., 2, 2])
         rotAngle3 = np.arctan2(C[..., 0, 2], C[..., 1, 2])
     elif rotation_sequence == 'YXZ':
         rotAngle1 = np.arctan2(C[..., 2, 0], C[..., 2, 2])
@@ -241,10 +241,26 @@ def dcm2angle(C, output_unit='rad', rotation_sequence='ZYX'):
         rotAngle1 = np.arctan2(C[..., 1, 2], -C[..., 1, 0])
         rotAngle2 = np.arccos(C[..., 1, 1])
         rotAngle3 = np.arctan2(C[..., 2, 1], C[..., 0, 1])
+    elif rotation_sequence == 'XYZ':
+        rotAngle1 = np.arctan2(-C[..., 2, 1], C[..., 2, 2])
+        rotAngle2 = np.arcsin(C[..., 2, 0])
+        rotAngle3 = np.arctan2(-C[..., 1, 0], C[..., 0, 0])
+    elif rotation_sequence == 'XYX':
+        rotAngle1 = np.arctan2(C[..., 0, 1], -C[..., 0, 2])
+        rotAngle2 = np.arccos(C[..., 0, 0])
+        rotAngle3 = np.arctan2(C[..., 1, 0], C[..., 2, 0])
+    elif rotation_sequence == 'XZY':
+        rotAngle1 = np.arctan2(C[..., 1, 2], C[..., 1, 1])
+        rotAngle2 = -np.arcsin(C[..., 1, 0])
+        rotAngle3 = np.arctan2(C[..., 2, 0], C[..., 0, 0])
+    elif rotation_sequence == 'XZX':
+        rotAngle1 = np.arctan2(C[..., 0, 2], C[..., 0, 1])
+        rotAngle2 = np.arccos(C[..., 0, 0])
+        rotAngle3 = np.arctan2(C[..., 2, 0], -C[..., 1, 0])
     else:
-        raise NotImplementedError('Rotation sequences other than ZYX are not currently implemented')
+        raise NotImplementedError('Rotation sequence ' + rotation_sequence + ' is not implemented')
 
-    if(output_unit == 'deg'):
+    if output_unit == 'deg':
         rotAngle1 = np.rad2deg(rotAngle1)
         rotAngle2 = np.rad2deg(rotAngle2)
         rotAngle3 = np.rad2deg(rotAngle3)
