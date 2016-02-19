@@ -665,6 +665,23 @@ class TestNavClass(unittest.TestCase):
                                     
         np.testing.assert_almost_equal(rho_x_expected, navpy.skew(rho))
         
+    def test_gravity(self):
+        """
+        Test gravity calculator
+        """    
+        checks = (
+            (0,0,9.78033),
+            (20, 10, 9.78634),
+            (45, 100, 9.80589),
+            (90, 0, 9.83219),
+            (-30, 1000, 9.79016),
+            (30, 8000, 9.76856)
+            )
+            
+        for lat, height, g_expected in checks:
+            g_computed = navpy.gravity(lat, height, lat_unit='deg')
+            np.testing.assert_almost_equal(g_computed, g_expected, decimal=5)
+                
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(TestNavClass)
     unittest.TextTestRunner(verbosity=2).run(suite)    

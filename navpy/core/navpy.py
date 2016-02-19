@@ -1370,4 +1370,21 @@ def rotvtom(phi, output_type='ndarray'):
         R = asmatrix(R)
         
     return R
+
+def gravity(lat, height, lat_unit='rad'):
+    """
+    Return the apparent gravity amplitude at the specified latitude and height
+    
+    Parameters:
+    lat: Latitude of point where to evaluate (in rad)
+    height: Height of point above the reference geoid (in m)
+    
+    Returns:
+    g: gravity in m/s^2
+    """
+    
+    if lat_unit == 'deg':
+        lat = np.deg2rad(lat)
+        
+    return 9.780327*(1.0 + 0.0053024*np.sin(lat)**2 - 0.0000058*np.sin(2.0*lat)**2) - 3.086E-6*height
     
