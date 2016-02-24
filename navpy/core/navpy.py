@@ -1363,7 +1363,7 @@ def rotvtom(phi, output_type='ndarray'):
     if philen == 0:
         R = np.eye(3,3);
     else:
-        phiskew = navpy.skew(phi);
+        phiskew = np.skew(phi);
         R = np.eye(3,3) + np.sin(philen)/philen*phiskew + (1 - np.cos(philen))/(philen*philen) * phiskew*phiskew;
 
     if output_type != 'ndarray':
