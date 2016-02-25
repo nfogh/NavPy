@@ -1363,11 +1363,11 @@ def rotvtom(phi, output_type='ndarray'):
     if philen == 0:
         R = np.eye(3,3);
     else:
-        phiskew = np.skew(phi);
-        R = np.eye(3,3) + np.sin(philen)/philen*phiskew + (1 - np.cos(philen))/(philen*philen) * phiskew*phiskew;
+        phiskew = skew(phi, output_type='matrix');
+        R = np.eye(3,3) + np.sin(philen)/philen*phiskew + (1 - np.cos(philen))/philen**2 * phiskew*phiskew;
 
     if output_type != 'ndarray':
-        R = asmatrix(R)
+        R = np.asmatrix(R)
         
     return R
 
